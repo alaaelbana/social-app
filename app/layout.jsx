@@ -1,3 +1,4 @@
+"use client";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { UserProvider } from "./contexts/UserContext";
@@ -17,7 +18,16 @@ export async function generateMetadata() {
     title: "SocialApp",
     description: "A social media app for developers",
     metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL),
-    robots: { index: false, follow: false },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+      },
+    },
   };
 }
 
