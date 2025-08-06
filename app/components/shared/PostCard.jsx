@@ -425,7 +425,7 @@ export default function PostCard({
               <img
                 src={post.image.url}
                 alt="Post image"
-                className="max-w-full max-h-[28rem] object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
+                className="max-w-full max-h-[33rem] object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
                 onClick={() => setShowFullscreen(true)}
               />
             )}

@@ -4,6 +4,7 @@ import Post from "../../../models/Post";
 import { getCurrentUser } from "../../lib/auth";
 import cloudinary from "../../lib/cloudinary";
 import { rateLimit } from "@/app/lib/rate-limit";
+import sharp from "sharp";
 
 // api/posts
 
@@ -95,31 +96,42 @@ export async function POST(request) {
     let imageData = null;
 
     // Handle image upload if present
+    // Handle image upload if present
     if (image && image.size > 0) {
       try {
         const bytes = await image.arrayBuffer();
         const buffer = Buffer.from(bytes);
 
-        // Upload to Cloudinary
-        const uploadResult = await new Promise((resolve, reject) => {
-          cloudinary.uploader
-            .upload_stream(
-              {
-                resource_type: "image",
-                folder: "social-app/posts",
-                format: "webp",
-                transformation: [
-                  { width: 1000, crop: "limit" },
-                  { quality: "auto" },
-                  { fetch_format: "webp" },
-                ],
+        // Check image dimensions using sharp (recommended) or canvas API
+        const metadata = await sharp(buffer).metadata();
+
+        // check image format
+        if (metadata.format !== "webp") {
+          return NextResponse.json(
+            {
+              error: "Image format must be webp",
+              details: {
+                currentFormat: metadata.format,
+                allowedFormats: "webp",
               },
-              (error, result) => {
-                if (error) reject(error);
-                else resolve(result);
-              }
-            )
-            .end(buffer);
+            },
+            { status: 400 }
+          );
+        }
+        // Validate image width
+        if (metadata.width > 1000) {
+          return NextResponse.json(
+            {
+              error: "Image width exceeds maximum allowed size of 1000px",
+              details: { currentWidth: metadata.width, maxAllowed: 1000 },
+            },
+            { status: 400 }
+          );
+        }
+
+        const base64 = `data:image/webp;base64,${buffer.toString("base64")}`;
+        const uploadResult = await cloudinary.uploader.upload(base64, {
+          folder: "social-app/posts",
         });
 
         imageData = {
