@@ -6,9 +6,7 @@ const UserContext = createContext();
 
 export const useUser = () => {
   const context = useContext(UserContext);
-  if (!context) {
-    throw new Error("useUser must be used within a UserProvider");
-  }
+  if (!context) throw new Error("useUser must be used within a UserProvider");
   return context;
 };
 
@@ -29,7 +27,7 @@ export const UserProvider = ({ children }) => {
         return null;
       }
     } catch (error) {
-      console.error("Auth check failed:", error);
+      console.log("Auth check failed:", error);
       setUser(null);
       return null;
     } finally {

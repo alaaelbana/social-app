@@ -13,9 +13,18 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+export async function generateMetadata() {
+  return {
+    title: "SocialApp",
+    description: "A social media app for developers",
+    metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL),
+    robots: { index: false, follow: false },
+  };
+}
+
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" title="SocialApp">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased text-white`}
       >
