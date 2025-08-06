@@ -20,16 +20,12 @@ export const UserProvider = ({ children }) => {
       const response = await fetch("/api/auth/me");
       if (response.ok) {
         const data = await response.json();
+        if (!data.success) return null;
         setUser(data.user);
-        return data.user;
-      } else {
-        setUser(null);
-        return null;
-      }
+      } else setUser(null);
     } catch (error) {
       console.log("Auth check failed:", error);
       setUser(null);
-      return null;
     } finally {
       setLoading(false);
     }
@@ -54,7 +50,6 @@ export const UserProvider = ({ children }) => {
   const value = {
     user,
     loading,
-    fetchUser,
     updateUser,
     logout,
     requireAuth,
