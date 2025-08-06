@@ -5,7 +5,7 @@ async function getInitialPosts() {
     // Fetch first 2 pages (20 posts) from the server
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_APP_URL}/api/posts?page=1&limit=20`,
-      { cache: "no-store" }
+      { next: { revalidate: 60 * 60 * 24 * 2 } }
     );
     if (!response.ok) throw new Error("Failed to fetch posts");
     const data = await response.json();

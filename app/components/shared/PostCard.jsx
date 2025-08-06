@@ -1,4 +1,5 @@
 "use client";
+import revalidate from "@/actions/revalidateTag";
 import { useState, useRef, useEffect } from "react";
 
 export default function PostCard({
@@ -97,10 +98,7 @@ export default function PostCard({
   };
 
   const handleEdit = async () => {
-    if (!editContent.trim()) {
-      setError("Post content cannot be empty");
-      return;
-    }
+    if (!editContent.trim()) return setError("Post content cannot be empty");
 
     setIsLoading(true);
     setError("");
@@ -109,13 +107,9 @@ export default function PostCard({
       const formData = new FormData();
       formData.append("content", editContent);
 
-      if (selectedImage) {
-        formData.append("image", selectedImage);
-      }
+      if (selectedImage) formData.append("image", selectedImage);
 
-      if (removeImage) {
-        formData.append("removeImage", "true");
-      }
+      if (removeImage) formData.append("removeImage", "true");
 
       const response = await fetch(`/api/posts/${post._id}`, {
         method: "PUT",
@@ -129,6 +123,7 @@ export default function PostCard({
         setIsEditing(false);
         setSelectedImage(null);
         setRemoveImage(false);
+        await revalidate("/");
       } else {
         setError(data.error || "Failed to update post");
       }
@@ -140,9 +135,7 @@ export default function PostCard({
   };
 
   const handleDelete = async () => {
-    if (!confirm("Are you sure you want to delete this post?")) {
-      return;
-    }
+    if (!confirm("Are you sure you want to delete this post?")) return;
 
     setIsLoading(true);
 
@@ -153,6 +146,7 @@ export default function PostCard({
 
       if (response.ok) {
         onPostDeleted(post._id);
+        await revalidate("/");
       } else {
         const data = await response.json();
         setError(data.error || "Failed to delete post");
@@ -176,6 +170,7 @@ export default function PostCard({
         const data = await response.json();
         setIsLiked(data.isLiked);
         setLikesCount(data.likesCount);
+        await revalidate("/");
       }
     } catch (error) {
       console.error("Error toggling like:", error);
@@ -200,6 +195,7 @@ export default function PostCard({
         setComments(data.post.comments);
         setNewComment("");
         onPostUpdated(data.post);
+        await revalidate("/");
       } else {
         const data = await response.json();
         setError(data.error || "Failed to add comment");
@@ -224,6 +220,7 @@ export default function PostCard({
         const data = await response.json();
         setComments(data.post.comments);
         onPostUpdated(data.post);
+        await revalidate("/");
       } else {
         const data = await response.json();
         setError(data.error || "Failed to delete comment");

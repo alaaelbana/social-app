@@ -1,12 +1,11 @@
 "use client";
 import { useState, useRef, useEffect, useTransition } from "react";
 import { useUser } from "@/app/contexts/UserContext";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
+import revalidate from "@/actions/revalidateTag";
 
 export default function PostForm() {
   const { user: currentUser, loading } = useUser();
-  const router = useRouter();
   const [content, setContent] = useState("");
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState("");
@@ -112,7 +111,7 @@ export default function PostForm() {
         if (res.ok) {
           setContent("");
           removeImage();
-          router.refresh();
+          await revalidate("/");
         } else {
           setError(data.error || "Failed to create post");
         }
@@ -146,7 +145,7 @@ export default function PostForm() {
 
   if (loading) {
     return (
-      <div className="min-h-[23rem] bg-black/20 backdrop-blur-sm rounded-xl p-6 mb-6 border border-[#8733ff]/20 shadow-lg shadow-[#531db5]/10">
+      <div className="min-h-[23.2rem] bg-black/20 backdrop-blur-sm rounded-xl p-6 mb-6 border border-[#8733ff]/20 shadow-lg shadow-[#531db5]/10">
         <div className="space-y-4 animate-pulse">
           <div className="flex items-start space-x-4">
             <div className="w-10 h-10 rounded-full bg-gray-700/50 flex-shrink-0"></div>
@@ -173,7 +172,7 @@ export default function PostForm() {
   if (!currentUser) {
     return (
       <Link
-        className="min-h-[23rem] flex items-center justify-center bg-black/20 backdrop-blur-sm rounded-xl p-6 mb-6 border border-[#8733ff]/20 shadow-lg shadow-[#531db5]/10"
+        className="min-h-[23.2rem] flex items-center justify-center bg-black/20 backdrop-blur-sm rounded-xl p-6 mb-6 border border-[#8733ff]/20 shadow-lg shadow-[#531db5]/10"
         href="/login"
       >
         <div className="flex flex-col items-center justify-center h-full space-y-6 mb-6">
@@ -249,7 +248,7 @@ export default function PostForm() {
   }
 
   return (
-    <div className="min-h-[23rem] bg-black/20 backdrop-blur-sm rounded-xl p-6 mb-6 border border-[#8733ff]/20 shadow-lg shadow-[#531db5]/10">
+    <div className="min-h-[23.2rem] bg-black/20 backdrop-blur-sm rounded-xl p-6 mb-6 border border-[#8733ff]/20 shadow-lg shadow-[#531db5]/10">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="flex items-start space-x-4">
           <img
