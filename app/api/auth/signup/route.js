@@ -9,7 +9,7 @@ import { rateLimit } from "@/app/lib/rate-limit";
 
 const postLimiter = rateLimit({
   interval: 30 * 60 * 1000, // 30 minute
-  limit: 3, // 3 requests per minute
+  limit: 10, // 10 requests per minute
   uniqueTokenPerInterval: 500,
 });
 

@@ -47,13 +47,7 @@ export const UserProvider = ({ children }) => {
     fetchUser();
   }, []);
 
-  const value = {
-    user,
-    loading,
-    updateUser,
-    logout,
-    requireAuth,
-  };
+  const value = { user, loading, updateUser, logout, requireAuth };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 };
