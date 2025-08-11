@@ -64,6 +64,7 @@ export async function POST(request) {
           email: user.email,
           image: user.image,
         },
+        token,
       },
       { status: 200 }
     );
