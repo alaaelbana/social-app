@@ -4,7 +4,7 @@ async function getRecentUsers() {
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_APP_URL}/api/users/recent`,
-      { next: { revalidate: 60 * 60 * 24 * 2 } }
+      // { next: { revalidate: 60 * 60 * 24 * 2 } }
       // { cache: "no-store" }
     );
     if (!response.ok) throw new Error("Failed to fetch recent users");
