@@ -6,7 +6,8 @@ import User from "../../models/User";
 // Verify JWT token from cookies
 export async function verifyToken(request) {
   try {
-    const token = request.cookies.get("token")?.value;
+    let token = request.cookies.get("token")?.value;
+    token = token ?? request.headers.get("authorization");
     if (!token) return null;
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     return decoded;
