@@ -3,7 +3,7 @@ import RecentUsersClient from "./RecentUsersClient";
 async function getRecentUsers() {
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_APP_URL}/api/users/recent`,
+      `${process.env.NEXT_PUBLIC_APP_URL}/api/users/recent`
       // { next: { revalidate: 60 * 60 * 24 * 2 } }
       // { cache: "no-store" }
     );

@@ -49,20 +49,15 @@ export default function SettingsPage() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleImageSelect = (file) => {
-    if (!file.type.startsWith("image/")) {
+    if (!file.type.startsWith("image/"))
       return setError("Please select a valid image file");
-    }
 
-    if (file.size > 5 * 1024 * 1024) {
+    if (file.size > 5 * 1024 * 1024)
       return setError("Image size must be less than 5MB");
-    }
 
     setSelectedImage(file);
     setImagePreview(URL.createObjectURL(file));

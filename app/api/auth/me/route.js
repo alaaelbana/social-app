@@ -50,12 +50,40 @@ export async function GET(request) {
   }
 }
 
+const allowedOrigins = [
+  "http://localhost:3000", // For local development
+  "https://your-frontend-domain.vercel.app", // IMPORTANT: Add your production frontend URL
+];
+
+const getCorsHeaders = (origin) => {
+  const headers = {
+    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+  };
+  if (origin && allowedOrigins.includes(origin)) {
+    headers["Access-Control-Allow-Origin"] = origin;
+  }
+  return headers;
+};
+
+// --- Handle Preflight OPTIONS Requests ---
+export async function OPTIONS(request) {
+  const origin = request.headers.get("origin");
+  return new NextResponse(null, {
+    status: 204, // No Content
+    headers: getCorsHeaders(origin),
+  });
+}
+
 const putLimiter = rateLimit({
   interval: 60 * 1000, // 1 minute
   limit: 10, // 10 requests per minute
   uniqueTokenPerInterval: 500,
 });
 export async function PUT(request) {
+  const origin = request.headers.get("origin");
+  const corsHeaders = getCorsHeaders(origin);
+
   try {
     await putLimiter.check(request);
     await connectMongoDB();
@@ -89,7 +117,7 @@ export async function PUT(request) {
       if (!emailRegex.test(email)) {
         return NextResponse.json(
           { error: "Invalid email format" },
-          { status: 400 }
+          { status: 400, headers: corsHeaders }
         );
       }
 
@@ -101,7 +129,7 @@ export async function PUT(request) {
       if (existingUser) {
         return NextResponse.json(
           { error: "Email already in use" },
-          { status: 400 }
+          { status: 409, headers: corsHeaders }
         );
       }
 
@@ -117,14 +145,14 @@ export async function PUT(request) {
       if (!isValidPassword) {
         return NextResponse.json(
           { error: "Current password is incorrect" },
-          { status: 400 }
+          { status: 400, headers: corsHeaders }
         );
       }
 
       if (newPassword.length < 6) {
         return NextResponse.json(
           { error: "New password must be at least 6 characters" },
-          { status: 400 }
+          { status: 400, headers: corsHeaders }
         );
       }
 
@@ -164,7 +192,7 @@ export async function PUT(request) {
         console.error("Image upload error:", error);
         return NextResponse.json(
           { error: "Failed to upload image" },
-          { status: 500 }
+          { status: 500, headers: corsHeaders }
         );
       }
     }
@@ -194,13 +222,13 @@ export async function PUT(request) {
           links: updatedUser.links,
         },
       },
-      { status: 200 }
+      { status: 200, headers: corsHeaders }
     );
   } catch (error) {
     console.error("Update profile error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     );
   }
 }
