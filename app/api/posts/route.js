@@ -63,13 +63,15 @@ const postLimiter = rateLimit({
 
 // POST - Create new post
 export async function POST(request) {
+  const origin = request.headers.get("origin");
+  const corsHeaders = getCorsHeaders(origin);
   try {
     await postLimiter.check(request);
     const user = await getCurrentUser(request);
     if (!user) {
       return NextResponse.json(
         { error: "Authentication required" },
-        { status: 401 }
+        { status: 401, headers: corsHeaders }
       );
     }
 
@@ -87,7 +89,7 @@ export async function POST(request) {
     if (content.length > 500) {
       return NextResponse.json(
         { error: "Post content must be 500 characters or less" },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       );
     }
 
@@ -115,7 +117,7 @@ export async function POST(request) {
                 allowedFormats: "webp",
               },
             },
-            { status: 400 }
+            { status: 400, headers: corsHeaders }
           );
         }
         // Validate image width
@@ -125,7 +127,7 @@ export async function POST(request) {
               error: "Image width exceeds maximum allowed size of 1000px",
               details: { currentWidth: metadata.width, maxAllowed: 1000 },
             },
-            { status: 400 }
+            { status: 400, headers: corsHeaders }
           );
         }
 
@@ -142,7 +144,7 @@ export async function POST(request) {
         console.error("Image upload error:", uploadError);
         return NextResponse.json(
           { error: "Failed to upload image" },
-          { status: 500 }
+          { status: 500, headers: corsHeaders }
         );
       }
     }
@@ -158,10 +160,13 @@ export async function POST(request) {
 
     return NextResponse.json(
       { message: "Post created successfully", post: newPost },
-      { status: 201 }
+      { status: 201, headers: corsHeaders }
     );
   } catch (error) {
     console.error("Create post error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json(
+      { error: error.message },
+      { status: 500, headers: corsHeaders }
+    );
   }
 }
