@@ -61,6 +61,31 @@ const postLimiter = rateLimit({
   uniqueTokenPerInterval: 500,
 });
 
+const allowedOrigins = [
+  "http://localhost:3000", // For local development
+  "https://your-frontend-domain.vercel.app", // IMPORTANT: Add your production frontend URL
+];
+
+const getCorsHeaders = (origin) => {
+  const headers = {
+    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+  };
+  if (origin && allowedOrigins.includes(origin)) {
+    headers["Access-Control-Allow-Origin"] = origin;
+  }
+  return headers;
+};
+
+// --- Handle Preflight OPTIONS Requests ---
+export async function OPTIONS(request) {
+  const origin = request.headers.get("origin");
+  return new NextResponse(null, {
+    status: 204, // No Content
+    headers: getCorsHeaders(origin),
+  });
+}
+
 // POST - Create new post
 export async function POST(request) {
   const origin = request.headers.get("origin");
